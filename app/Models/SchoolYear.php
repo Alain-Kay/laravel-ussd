@@ -18,7 +18,6 @@ class SchoolYear extends Model
         'year',
         'start_date',
         'end_date',
-        'is_active',
     ];
 
 }
