@@ -6,11 +6,18 @@ use Illuminate\Http\Request;
 use AfricasTalking\SDK\AfricasTalking;
 use AfricasTalking\SDK\MobileData;
 use App\Models\School;
+use App\Repository\ResultRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use LDAP\Result;
 
 class UssdController extends Controller
 {
+    public function __construct(
+        protected ResultRepository $resultRepository
+    ) {}
+
+
     public function handle(Request $request)
     {
         $sessionId   = $request->input('sessionId');
@@ -43,7 +50,7 @@ class UssdController extends Controller
 
 
                 try {
-                    $results = $this->getStudentResult($studentName);
+                    $results = $this->resultRepository->getStudentResult($studentName);
 
                     if ($results->isNotEmpty()) {
                         $response = "END Derniers résultats de l'élève : \n";
@@ -77,34 +84,4 @@ class UssdController extends Controller
         $response = "END Option non valide. Veuillez réessayer.\n";
         return response($response)->header('Content-Type', 'text/plain');
     }
-
-    private function getStudentResult($studentName)
-    {
-        // Nettoyer le nom de recherche
-        $searchName = '%' . str_replace(' ', '%', trim($studentName)) . '%';
-
-        return DB::table('students')
-            ->join('results', 'students.id', '=', 'results.student_id')
-            ->join('schools', 'results.school_id', '=', 'schools.id')
-            ->join('school_years', 'results.school_year_id', '=', 'school_years.id')
-            ->select(
-                DB::raw('CONCAT(students.first_name, " ", COALESCE(students.middle_name, ""), " ", students.last_name) as nom_complet'),
-                'schools.name as ecole',
-                'results.percentage as pourcentage',
-                'results.rank',
-                'results.average',
-                'school_years.year as annee_scolaire'
-            )
-            ->where(function($query) use ($searchName) {
-                $query->where(DB::raw('CONCAT(students.first_name, " ", COALESCE(students.middle_name, ""), " ", students.last_name)'), 'LIKE', $searchName)
-                      ->orWhere(DB::raw('CONCAT(students.first_name, " ", students.last_name)'), 'LIKE', $searchName)
-                      ->orWhere('students.first_name', 'LIKE', $searchName)
-                      ->orWhere('students.last_name', 'LIKE', $searchName);
-            })
-            ->orderBy('school_years.year', 'desc')
-            ->limit(3)
-            ->get();
-    }
-
-
 }
