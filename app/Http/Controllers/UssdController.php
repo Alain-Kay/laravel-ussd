@@ -25,19 +25,14 @@ class UssdController extends Controller
         $phoneNumber = $request->input('phoneNumber');
         $text        = $request->input('text');
 
-        // Log pour débugger
-        Log::info('USSD Request', [
-            'sessionId' => $sessionId,
-            'phoneNumber' => $phoneNumber,
-            'text' => $text
-        ]);
+
 
         $steps = explode('*', $text);
 
         if ($text == "") {
             $response  = "CON Trouver le parcours scolaires. \n";
             $response .= "1. Rechercher un élève\n";
-            $response .= "2. Rechercher une école\n";
+
             return response($response)->header('Content-Type', 'text/plain');
         }
 
@@ -74,14 +69,14 @@ class UssdController extends Controller
             }
         }
 
-        if ($steps[0] == "2") {
+        if ($steps[0] == "2" || $steps[0] == "3") {
             // Option pour rechercher une école (à implémenter)
-            $response = "END Fonction de recherche d'école en cours de développement.\n";
+            $response = "END Option en cours de développement.\n";
             return response($response)->header('Content-Type', 'text/plain');
         }
 
         // Option non valide
         $response = "END Option non valide. Veuillez réessayer.\n";
         return response($response)->header('Content-Type', 'text/plain');
-    }
+     }
 }

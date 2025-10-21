@@ -1,61 +1,174 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+#  USSD Application - 
+**Interactive USSD Application** developed with Laravel to allow real-time consultation of school results directly from any mobile phone, without internet connection or smartphone required.
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
 
-## About Laravel
+##  How Does USSD Work?
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+This application implements a complete USSD service allowing users to:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+1. **Dial a USSD code** (e.g., `*123#`) directly from their phone keypad
+2. **Navigate an interactive menu** in real-time via USSD sessions
+3. **Search and consult** school results without downloading an application
+4. **Receive an instant response** displayed directly on the phone screen
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### USSD Advantages for Education
 
-## Learning Laravel
+The USSD implementation is particularly suited to the African educational context:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+##  USSD Features
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+- **Student Search**: Search by full name
+- **Results Consultation**: Display of latest school results
+- **Detailed Information**:
+  - Student's full name
+  - School year
+  - School attended
+  - Percentage obtained
+  - Student's rank
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+##  Technical Stack USSD
 
-## Laravel Sponsors
+- **Protocol**: USSD (Unstructured Supplementary Service Data)
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+##  Prerequisites
 
-### Premium Partners
+- PHP 8.2 or higher
+- Composer
+- MySQL
+- An Africa's Talking account for USSD service
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+##  Installation
 
-## Contributing
+1. **Clone the project**
+```bash
+git clone https://github.com/Alain-Kay/laravel-ussd.git
+cd laravel-ussd
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+2. **Install dependencies**
+```bash
+composer install
+```
 
-## Code of Conduct
+3. **Configure the environment**
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+4. **Run migrations**
+```bash
+php artisan migrate --seed
+```
 
-## Security Vulnerabilities
+5. **Configure Africa's Talking USSD**
+   
+   a. Create an account on [Africa's Talking](https://africastalking.com)
+   
+   b. Create a USSD code in the dashboard (e.g., `*123#`)
+   
+   c. Configure the USSD callback URL to your server:
+   ```
+   https://your-domain.com/ussd/callback
+   ```
+   
+   d. Add your Africa's Talking credentials in `.env`:
+   ```env
+   AT_USERNAME=your_username
+   AT_API_KEY=your_api_key
+   ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+6. **Start the server**
+```bash
+php artisan serve
+```
 
-## License
+7. **Test the USSD service**
+   - Use Africa's Talking USSD simulator to test
+   - Or dial the USSD code from Africa's Talking USSD emulator
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+##  USSD Implementation
+
+### USSD Architecture
+
+This application uses **Africa's Talking USSD Gateway** to manage interactive USSD sessions.
+
+**USSD callback endpoint**: `POST /ussd/callback`
+
+### USSD parameters received from gateway:
+- `sessionId`: Unique identifier of the active USSD session
+- `serviceCode`: USSD code dialed by the user (e.g., *123#)
+- `phoneNumber`: User's phone number
+- `text`: User input, separated by `*` for each step
+
+### USSD Responses:
+The application returns text responses with specific prefixes:
+
+- **`CON`** (Continue): Menu or prompt requiring a user response
+- **`END`**: Final message that terminates the USSD session
+
+### USSD Navigation Flow:
+
+```
+*123# (Dialing the code)
+    ↓
+CON Find the school records.
+1. Search for a student
+    ↓
+[1] (User chooses option 1)
+    ↓
+CON Enter the student's full name:
+    ↓
+[Jean Dupont] (User enters the name)
+    ↓
+END Student's latest results:
+Name: Jean Dupont
+Year: 2024-2025
+School: ABC Primary School
+Percentage: 85%
+Rank: 5
+```
+
+### USSD Session Management:
+- Each session is tracked via `sessionId`
+- Navigation uses the `*` character as a separator
+- Steps are tracked via `explode('*', $text)`
+
+
+
+### USSD User Experience
+
+**Step 1: Initiating the USSD session**
+- Dial the assigned USSD code (e.g., `*123#`) on any phone
+- Press the call button
+- An interactive USSD session opens instantly
+
+**Step 2: Navigating the USSD menu**
+- The main menu displays: "Find the school records"
+- Type `1` for "Search for a student"
+- The USSD application responds immediately
+
+**Step 3: Searching via USSD**
+- Enter the student's full name (e.g., "Jean Dupont")
+- Validate with OK
+- The USSD system processes the request in real-time
+
+**Step 4: Consulting results**
+- Results are displayed directly on your screen
+- No internet connection is required
+- The USSD session ends automatically
+
+
+## 🤝 Contribution
+
+Contributions are welcome! Feel free to:
+1. Fork the project
+2. Create a branch for your feature
+3. Commit your changes
+4. Push to the branch
+5. Open a Pull Request
+
+## 📄 License
+
+This project is under MIT license.
