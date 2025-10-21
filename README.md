@@ -74,8 +74,8 @@ php artisan migrate --seed
    
    d. Add your Africa's Talking credentials in `.env`:
    ```env
-   AT_USERNAME=your_username
-   AT_API_KEY=your_api_key
+   AFRICASTALKING_USERNAME=your_username
+   AFRICASTALKING_API_KEY=your_api_key
    ```
 
 6. **Start the server**
@@ -134,7 +134,6 @@ Rank: 5
 - Each session is tracked via `sessionId`
 - Navigation uses the `*` character as a separator
 - Steps are tracked via `explode('*', $text)`
-
 
 
 ### USSD User Experience
